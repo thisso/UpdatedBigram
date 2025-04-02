@@ -91,6 +91,7 @@ class BigramLanguageModel(nn.Module):
     def forward(self, idx, targets=None):
 
         # idx and targets are both (B,T) tensor of integers
+        #creating the logits from the forward pass
         logits = self.token_embedding_table(idx) # (B,T,C)
 
         if targets is None:
@@ -120,8 +121,8 @@ class BigramLanguageModel(nn.Module):
 
 m = BigramLanguageModel(vocab_size)
 logits, loss = m(xb, yb) #forward pass
-print(logits.shape)
-print(loss)
+# print(logits.shape)
+# print(loss)
 print(decode(m.generate(idx = torch.zeros((1, 1), dtype=torch.long), 
                         max_new_tokens=100)[0].tolist()))
 
@@ -129,7 +130,7 @@ print(decode(m.generate(idx = torch.zeros((1, 1), dtype=torch.long),
 optimizer = torch.optim.AdamW(m.parameters(), lr = 1e-3)
 
 batch_size = 32
-for steps in range(100): #bump up step size to increase reults 
+for steps in range(20000): #bump up step size to increase reults 
     #sampel, a batch of data
     xb, yb = get_batch('train')
 
@@ -138,4 +139,6 @@ for steps in range(100): #bump up step size to increase reults
     optimizer.zero_grad(set_to_none=True)
     loss.backward()
     optimizer.step() #optimizer adjust the weights 
-print(loss)
+print(loss.item())
+print(decode(m.generate(idx = torch.zeros((1, 1), dtype=torch.long), 
+                        max_new_tokens=200)[0].tolist()))
